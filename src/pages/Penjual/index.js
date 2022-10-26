@@ -7,7 +7,6 @@ import {
     FlatList,
     SafeAreaView,
     RefreshControl,
-    Alert,
     Image,
     TouchableOpacity,
     TextInput,
@@ -26,37 +25,87 @@ const wait = timeout => {
         setTimeout(resolve, timeout);
     });
 };
-export default function ({ navigation, route }) {
+export default function Penjual({ navigation, route }) {
     const [refreshing, setRefreshing] = React.useState(false);
     const [data, setData] = useState([]);
     const [user, setUser] = useState({});
     const [show, setShow] = useState({});
     const [jumlah, setJumlah] = useState(1);
+    const [kategori, setKategori] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [myKey, setMykey] = useState('');
 
-    const onRefresh = React.useCallback(() => {
-        setRefreshing(true);
-        getDataBarang();
-        wait(2000).then(() => setRefreshing(false));
-    }, []);
+    // const key = route.params.key;
+
+    const key = 0;
+
+    // const onRefresh = React.useCallback(() => {
+    //   setRefreshing(true);
+    //   getDataBarang();
+    //   wait(2000).then(() => setRefreshing(false));
+    // }, []);
 
     useEffect(() => {
-
-
-        getDataBarang();
-
-    }, []);
-
-    const getDataBarang = () => {
         getData('user').then(res => {
             setUser(res);
-            axios
-                .post(urlAPI + '/1data_wish.php', {
-                    fid_user: res.id,
-                })
-                .then(x => {
-                    console.log(x.data);
-                    setData(x.data);
+        })
+        getDataBarang();
+        getDataKategori();
+    }, []);
+
+    const addToCart = () => {
+        const kirim = {
+            fid_user: user.id,
+            fid_barang: show.id,
+            harga_dasar: show.harga_dasar,
+            diskon: show.diskon,
+            harga: show.harga_barang,
+            qty: jumlah,
+            total: show.harga_barang * jumlah
+        };
+        console.log('kirim tok server', kirim);
+        axios
+            .post(urlAPI + '/1add_cart.php', kirim)
+            .then(res => {
+                console.log(res);
+
+                showMessage({
+                    type: 'success',
+                    message: 'Berhasil ditambahkan ke keranjang',
                 });
+                // navigation.replace('MainApp');
+                modalizeRef.current.close();
+            });
+    };
+
+    const modalizeRef = useRef();
+
+    const onOpen = () => {
+        modalizeRef.current?.open();
+    };
+
+
+
+
+    const getDataKategori = () => {
+        axios.post(urlAPI + '/1data_kategori.php').then(res => {
+            console.log('kategori', res.data);
+
+            setKategori(res.data);
+        })
+    }
+
+
+    const getDataBarang = (y, z = key == null ? '' : key) => {
+        setLoading(true);
+        axios.post(urlAPI + '/1data_barang.php', {
+            key: z,
+            key2: y,
+        }).then(res => {
+            setMykey('');
+            console.warn(res.data);
+            setLoading(false);
+            setData(res.data);
         });
     };
 
@@ -86,7 +135,7 @@ export default function ({ navigation, route }) {
                         color: colors.textSecondary,
                         fontFamily: fonts.secondary[400],
                     }}>
-                    {item.berat} kg / {item.umur} Bulan
+                    {item.berat} Kg /  {item.umur} Bulan
                 </Text>
                 <Text
                     style={{
@@ -98,39 +147,30 @@ export default function ({ navigation, route }) {
                     {new Intl.NumberFormat().format(item.harga_barang)}
                 </Text>
                 <TouchableOpacity onPress={() => {
+                    axios.post(urlAPI + '/1add_wish.php', {
+                        fid_user: user.id,
+                        fid_barang: item.id
+                    }).then(x => {
+                        console.warn('add wishlist', x.data);
 
-                    Alert.alert(
-                        "STAR-PAK",
-                        "Apakah kamu yakin akan hapus ini ?",
-                        [
-                            {
-                                text: "Cancel",
-                                onPress: () => console.log("Cancel Pressed"),
-                                style: "cancel"
-                            },
-                            {
-                                text: "OK", onPress: () => {
-                                    axios.post(urlAPI + '/1delete_wish.php', {
-                                        fid_user: user.id,
-                                        fid_barang: item.id
-                                    }).then(x => {
-                                        console.warn('add wishlist', x.data);
-                                        getDataBarang();
-
-                                    })
-                                }
-                            }
-                        ]
-                    );
-
-
-
+                        if (x.data == 200) {
+                            showMessage({
+                                type: 'success',
+                                message: item.nama_barang + ' berhasil ditambahkan ke favorit !'
+                            })
+                        } else {
+                            showMessage({
+                                type: 'danger',
+                                message: item.nama_barang + ' sudah ada di favorit kamu !'
+                            })
+                        }
+                    })
 
                 }} style={{
                     width: 30,
                     marginVertical: 20,
                 }}>
-                    <Icon type='ionicon' name='trash-outline' />
+                    <Icon type='ionicon' name='heart-outline' />
                 </TouchableOpacity>
             </View>
             <View style={{
@@ -172,68 +212,127 @@ export default function ({ navigation, route }) {
         </View>
     );
 
+    const __renderItemKategori = ({ item }) => {
+        return (
+            <TouchableOpacity onPress={() => getDataBarang('', item.id)} style={{
+                marginVertical: 10,
+                borderBottomWidth: 1,
+                paddingBottom: 10,
+                borderBottomColor: colors.border_list,
+                flex: 1,
 
-    const addToCart = () => {
-        const kirim = {
-            fid_user: user.id,
-            fid_barang: show.id,
-            harga_dasar: show.harga_dasar,
-            diskon: show.diskon,
-            harga: show.harga_barang,
-            qty: jumlah,
-            total: show.harga_barang * jumlah
-        };
-        console.log('kirim tok server', kirim);
-        axios
-            .post(urlAPI + '/1add_cart.php', kirim)
-            .then(res => {
-                console.log(res);
+            }}>
 
-                showMessage({
-                    type: 'success',
-                    message: 'Berhasil ditambahkan ke keranjang',
-                });
-                // navigation.replace('MainApp');
-                modalizeRef.current.close();
-            });
-    };
+                <View style={{
+                    justifyContent: 'center',
+                    alignItems: 'center',
 
-    const modalizeRef = useRef();
+                }}>
+                    <Image style={{
+                        width: 70,
+                        height: 70,
+                        resizeMode: 'contain'
 
-    const onOpen = () => {
-        modalizeRef.current?.open();
-    };
-
-
-
+                    }} source={{
+                        uri: item.image
+                    }} />
+                </View>
+                <Text style={{
+                    textAlign: 'center',
+                    color: colors.textPrimary,
+                    fontFamily: fonts.secondary[600],
+                    fontSize: windowWidth / 32,
+                }}>{item.nama_penjual}</Text>
+                <Text style={{
+                    textAlign: 'center',
+                    color: colors.textPrimary,
+                    fontFamily: fonts.secondary[400],
+                    fontSize: windowWidth / 32,
+                }}>{item.wilayah_penjual}</Text>
+            </TouchableOpacity>
+        )
+    }
 
     return (
-        <>
-            <ScrollView
-                refreshControl={
-                    <RefreshControl
-                        refreshing={refreshing}
-                        onRefresh={onRefresh}
-                        colors={[colors.primary]}
-                    />
-                }
-                style={{
-                    padding: 10,
-                    backgroundColor: colors.background1,
-                }}>
-                {data.length == 0 && <Text style={{
-                    padding: 20,
-                    fontFamily: fonts.secondary[600],
-                    color: colors.primary,
-                    textAlign: 'center'
-                }}>Anda belum menyukai</Text>}
-                <FlatList
-                    data={data}
-                    renderItem={renderItem}
-                    keyExtractor={item => item.id}
-                />
+        <SafeAreaView
 
-            </ScrollView>
+            style={{
+                flex: 1,
+                padding: 10,
+
+                backgroundColor: colors.background1,
+            }}>
+            <View style={{
+                position: 'relative',
+                marginBottom: 10,
+            }}>
+                <TextInput value={myKey} autoCapitalize='none' onSubmitEditing={(x) => {
+                    console.warn(x.nativeEvent.text);
+                    setMykey(x.nativeEvent.text);
+                    getDataBarang(x.nativeEvent.text);
+                }}
+                    onChangeText={x => setMykey(x)}
+                    placeholderTextColor={colors.border}
+                    placeholder='Masukan kata kunci' style={{
+                        fontFamily: fonts.secondary[400],
+                        color: colors.black,
+                        fontSize: windowWidth / 30,
+                        paddingLeft: 10,
+                        borderRadius: 5,
+                        backgroundColor: colors.background6
+
+                        // borderRadius: 10,
+                    }} />
+                <View style={{
+                    position: 'absolute',
+                    right: 10,
+                    top: 10,
+                }}>
+                    <Icon type='ionicon' name='search-outline' color={colors.border} />
+                </View>
+            </View>
+
+
+
+            <View style={{
+                flexDirection: 'row'
+            }}>
+
+                {key == 0 && (
+                    <View style={{
+                        flex: 0.3,
+
+                    }}>
+                        <FlatList
+                            showsVerticalScrollIndicator={false}
+                            data={kategori}
+                            renderItem={__renderItemKategori}
+                            keyExtractor={item => item.id}
+                        />
+                    </View>
+                )}
+
+                <View style={{
+                    flex: 1,
+                    paddingLeft: 10,
+                }}>
+                    {loading && <View style={{
+                        flex: 1,
+                        marginTop: '50%',
+                        justifyContent: 'center',
+                        alignItems: 'center'
+                    }}>
+                        <ActivityIndicator size="large" color={colors.primary} /></View>}
+                    {!loading && <FlatList
+                        showsVerticalScrollIndicator={false}
+                        data={data}
+                        renderItem={renderItem}
+                        keyExtractor={item => item.id}
+                    />}
+                </View>
+            </View>
+
+
             <Modalize
                 withHandle={false}
                 scrollViewProps={{ showsVerticalScrollIndicator: false }}
@@ -359,7 +458,7 @@ export default function ({ navigation, route }) {
                     </View>
                 </View>
             </Modalize>
-        </>
+        </SafeAreaView>
     );
 }
 

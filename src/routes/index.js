@@ -57,6 +57,7 @@ import {
   Kuis,
   Wishlist,
   BarangDetail,
+  Penjual,
 } from '../pages';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { BottomNavigator } from '../components';
@@ -70,7 +71,7 @@ const MainApp = () => {
   return (
     <Tab.Navigator tabBar={props => <BottomNavigator {...props} />}>
       <Tab.Screen name="Home" component={Home} />
-      <Tab.Screen name="Kategori" component={Barang} />
+      <Tab.Screen name="Kategori" component={Penjual} />
 
       <Tab.Screen name="History" component={ListData} />
 

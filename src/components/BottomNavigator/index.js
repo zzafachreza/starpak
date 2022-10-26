@@ -79,14 +79,7 @@ export default function BottomNavigator({ state, descriptors, navigation }) {
             accessibilityStates={isFocused ? ['selected'] : []}
             accessibilityLabel={options.tabBarAccessibilityLabel}
             testID={options.tabBarTestID}
-            onPress={
-              label === 'Kategori'
-                ? () =>
-                  navigation.navigate('Barang', {
-                    key: 0
-                  })
-                : onPress
-            }
+            onPress={onPress}
             onLongPress={onLongPress}
             style={{ flex: 1 }}>
             <View

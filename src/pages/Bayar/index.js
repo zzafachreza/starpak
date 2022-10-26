@@ -218,10 +218,7 @@ export default function Bayar({ navigation, route }) {
             return (
               <TouchableOpacity onPress={() => {
 
-                // const numbers = bank;
-                // const evens = numbers.filter((item, index) => index === i);
-                // console.log(evens); // [2, 4]
-                // setBank(evens);
+
                 setData({
                   ...data,
                   nama_bank: p.nama_bank,
@@ -237,16 +234,17 @@ export default function Bayar({ navigation, route }) {
 
               }} style={{
                 backgroundColor: colors.white,
+                borderBottomWidth: 1,
+                borderBottomColor: colors.zavalabs,
                 padding: 5,
                 marginVertical: 2,
-                flexDirection: 'row'
               }}>
                 <View style={{
-                  flex: 1,
                   flexDirection: 'row'
                 }}>
                   <View style={{
                     paddingRight: 10,
+                    justifyContent: 'center'
                   }}>
                     <Text style={{
                       fontFamily: fonts.secondary[600],
@@ -261,7 +259,10 @@ export default function Bayar({ navigation, route }) {
                       fontSize: windowWidth / 30
                     }}>Nomor Rekening</Text>
                   </View>
-                  <View>
+                  <View style={{
+                    flex: 1,
+                    justifyContent: 'center'
+                  }}>
                     <Text style={{
                       fontFamily: fonts.secondary[400],
                       fontSize: windowWidth / 30
@@ -275,18 +276,34 @@ export default function Bayar({ navigation, route }) {
                       fontSize: windowWidth / 30
                     }}>{p.rekening_bank}</Text>
                   </View>
+                  <View style={{
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}>
+                    <Image source={{
+                      uri: p.image
+                    }} style={{
+                      resizeMode: 'contain',
+                      width: 80,
+                      height: 80
+                    }} />
+
+
+                  </View>
                 </View>
+
                 <View style={{
-                  justifyContent: 'flex-end',
-                  alignItems: 'flex-end'
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  backgroundColor: colors.primary,
+                  padding: 10,
                 }}>
-                  <Image source={{
-                    uri: p.image
-                  }} style={{
-                    resizeMode: 'contain',
-                    width: 80,
-                    height: 80
-                  }} />
+
+
+                  <Text style={{
+                    fontFamily: fonts.secondary[600],
+                    color: colors.white
+                  }}>Pilih Bank</Text>
 
 
                 </View>

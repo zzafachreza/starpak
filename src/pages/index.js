@@ -46,6 +46,9 @@ import AddDua from './AddDua';
 import Kuis from './Kuis';
 import Wishlist from './Wishlist';
 import BarangDetail from './BarangDetail';
+import Penjual from './Penjual';
+
+
 
 
 
@@ -59,6 +62,7 @@ export {
   SuratIzin,
   AddDua,
   AddSatu,
+  Penjual,
   Add,
   Add2
   ,

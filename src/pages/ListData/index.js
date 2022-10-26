@@ -187,6 +187,12 @@ export default function ({ navigation, route }) {
         padding: 10,
         backgroundColor: colors.background1,
       }}>
+      {data.length == 0 && <Text style={{
+        padding: 20,
+        fontFamily: fonts.secondary[600],
+        color: colors.primary,
+        textAlign: 'center',
+      }}>Belum ada proses transaksi</Text>}
       <FlatList
         data={data}
         renderItem={renderItem}

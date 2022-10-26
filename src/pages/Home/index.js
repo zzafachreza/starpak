@@ -34,8 +34,14 @@ export default function Home({ navigation }) {
   const [token, setToken] = useState('');
 
   const isFocused = useIsFocused();
-
+  const [comp, setComp] = useState({});
   useEffect(() => {
+
+    axios.post(urlAPI + '/company.php').then(res => {
+      console.log('compamu', res.data)
+      setComp(res.data)
+    })
+
 
     const unsubscribe = messaging().onMessage(async remoteMessage => {
 
@@ -363,7 +369,21 @@ export default function Home({ navigation }) {
           </TouchableOpacity>
 
 
+          <TouchableOpacity
+            onPress={() => Linking.openURL('https://wa.me/' + comp.tlp)}
+            style={{
+              position: 'relative',
+              width: 50,
+              height: 50,
+              justifyContent: 'center',
+              alignItems: 'center'
 
+
+            }}>
+            <Icon type='ionicon' name="logo-whatsapp" color={colors.border} />
+
+
+          </TouchableOpacity>
 
           <TouchableOpacity
             onPress={() => navigation.navigate('Cart')}
