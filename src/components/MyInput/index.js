@@ -53,6 +53,7 @@ export default function MyInput({
         position: 'relative'
       }}>
         <TextInput
+          placeholderTextColor={colors.border}
           maxLength={maxLength}
           multiline={multiline}
           autoFocus={autoFocus}

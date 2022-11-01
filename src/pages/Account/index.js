@@ -6,6 +6,7 @@ import {
   SafeAreaView,
   Image,
   Linking,
+  Alert
 } from 'react-native';
 import { windowWidth, fonts } from '../../utils/fonts';
 import { getData, storeData } from '../../utils/localStorage';
@@ -35,9 +36,21 @@ export default function Account({ navigation, route }) {
   }, [isFocused]);
 
   const btnKeluar = () => {
-    storeData('user', null);
+    Alert.alert('STAR-PAK', 'Apakah Anda yakin ingin keluar ?', [
+      {
+        text: 'Tidak',
+        style: 'cancel'
+      },
+      {
+        text: 'Keluar',
+        style: 'default',
+        onPress: () => {
+          storeData('user', null);
 
-    navigation.replace('Login');
+          navigation.replace('Login');
+        }
+      }
+    ])
   };
 
   const kirimWa = x => {
